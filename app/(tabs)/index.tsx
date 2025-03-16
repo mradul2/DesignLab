@@ -1,15 +1,50 @@
-import { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-
 import { useSettings } from '@/contexts/SettingsContext';
 
 export default function HomeScreen() {
-  // const [isMonitoringActive, setIsMonitoringActive] = useState(true);
   const { isMonitoringActive } = useSettings();
+  const [cameras, setCameras] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCameras = async () => {
+      try {
+        const response = await fetch('http://192.168.0.121:3000/api/streams') ;
+        const data = await response.json();
+        setCameras(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCameras();
+  }, []);
+
+  if (loading) {
+    return (
+      <ThemedView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2ed573" />
+      </ThemedView>
+    );
+  }
+
+  if (error) {
+    return (
+      <ThemedView style={styles.errorContainer}>
+        <ThemedText style={styles.errorText}>
+          Failed to load cameras: {error}
+        </ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
     <ParallaxScrollView
@@ -32,16 +67,31 @@ export default function HomeScreen() {
           </ThemedText>
         </ThemedView>
 
+        {/* Camera List */}
+        <ThemedView style={styles.cameraList}>
+          {cameras.map((camera) => (
+            <Link 
+              key={camera.id} 
+              href={{
+                pathname: "/camera-feed/[id]",
+                params: { id: camera.id }
+              }} 
+              asChild
+            >
+              <TouchableOpacity style={styles.cameraCard}>
+                <ThemedText type="defaultSemiBold" style={styles.cameraName}>
+                  {camera.name}
+                </ThemedText>
+                <ThemedText style={styles.cameraStatus}>
+                  {isMonitoringActive ? 'Live' : 'Offline'}
+                </ThemedText>
+              </TouchableOpacity>
+            </Link>
+          ))}
+        </ThemedView>
+
         {/* Action Buttons */}
         <ThemedView style={styles.buttonContainer}>
-          <Link href="/camera-feeds" asChild>
-            <TouchableOpacity style={styles.button}>
-              <ThemedText type="defaultSemiBold" style={styles.buttonText}>
-                View Camera Feeds
-              </ThemedText>
-            </TouchableOpacity>
-          </Link>
-          
           <Link href="/analytics" asChild>
             <TouchableOpacity style={styles.button}>
               <ThemedText type="defaultSemiBold" style={styles.buttonText}>
@@ -68,6 +118,21 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#ff4757',
+    textAlign: 'center',
+  },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -85,6 +150,24 @@ const styles = StyleSheet.create({
   statusText: {
     color: '#fff',
     fontSize: 16,
+  },
+  cameraList: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  cameraCard: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 16,
+  },
+  cameraName: {
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  cameraStatus: {
+    color: '#888',
+    fontSize: 14,
   },
   buttonContainer: {
     gap: 12,

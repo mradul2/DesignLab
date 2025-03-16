@@ -7,6 +7,8 @@ type Contact = {
 };
 
 type SettingsContextType = {
+  isDarkMode: boolean;
+  toggleTheme: () => Promise<void>;
   isMonitoringActive: boolean;
   toggleMonitoring: () => Promise<void>;
   notificationContacts: Contact[];
@@ -15,6 +17,8 @@ type SettingsContextType = {
 };
 
 const SettingsContext = createContext<SettingsContextType>({
+  isDarkMode: true,
+  toggleTheme: async () => {},
   isMonitoringActive: true,
   toggleMonitoring: async () => {},
   notificationContacts: [],
@@ -25,21 +29,30 @@ const SettingsContext = createContext<SettingsContextType>({
 export const useSettings = () => useContext(SettingsContext);
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMonitoringActive, setIsMonitoringActive] = useState(true);
   const [notificationContacts, setNotificationContacts] = useState<Contact[]>([]);
 
   useEffect(() => {
     const loadState = async () => {
-      const [savedState, savedContacts] = await Promise.all([
+      const [savedTheme, savedState, savedContacts] = await Promise.all([
+        AsyncStorage.getItem('darkMode'),
         AsyncStorage.getItem('monitoringActive'),
         AsyncStorage.getItem('notificationContacts'),
       ]);
       
+      if (savedTheme !== null) setIsDarkMode(savedTheme === 'true');
       if (savedState !== null) setIsMonitoringActive(savedState === 'true');
       if (savedContacts) setNotificationContacts(JSON.parse(savedContacts));
     };
     loadState();
   }, []);
+
+  const toggleTheme = async () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    await AsyncStorage.setItem('darkMode', newTheme.toString());
+  };
 
   const toggleMonitoring = async () => {
     const newState = !isMonitoringActive;
@@ -64,9 +77,11 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     await AsyncStorage.setItem('notificationContacts', JSON.stringify(updatedContacts));
   };
 
-  return (
+return (
     <SettingsContext.Provider 
       value={{ 
+        isDarkMode,
+        toggleTheme,
         isMonitoringActive,
         toggleMonitoring,
         notificationContacts,

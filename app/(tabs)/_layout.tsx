@@ -5,22 +5,22 @@ import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useSettings } from '@/contexts/SettingsContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { isDarkMode } = useSettings();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#2ed573', // Force green active color
-        tabBarInactiveTintColor: '#888', // Gray for inactive
+        tabBarActiveTintColor: Colors[isDarkMode ? 'dark' : 'light'].primary,
+        tabBarInactiveTintColor: Colors[isDarkMode ? 'dark' : 'light'].textSecondary,
         headerShown: true,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
-          backgroundColor: '#1a1a1a', // Dark background
-          borderTopColor: '#333',
+          backgroundColor: Colors[isDarkMode ? 'dark' : 'light'].background,
+          borderTopColor: Colors[isDarkMode ? 'dark' : 'light'].border,
           ...Platform.select({
             ios: { position: 'absolute' },
             default: {}
@@ -35,7 +35,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings" // Changed from explore to settings
+        name="settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
