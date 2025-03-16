@@ -18,8 +18,9 @@ const cameras = [
   {
     id: 'cam1',
     name: 'Entrance Camera',
-    hlsUrl: 'http://192.168.0.121:3000/live/cam1.m3u8',
-    rtspUrl: 'rtsp://192.168.0.121:8554/cam1'
+    hlsUrl: 'http://192.168.0.121:8888/live/cam1.m3u8',
+    rtspUrl: 'rtsp://192.168.0.121:8554/cam1',
+    features: ['human-detection']  // New field for mobile UI
   },
   {
     id: 'cam2',

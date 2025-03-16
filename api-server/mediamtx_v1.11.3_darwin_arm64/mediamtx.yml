@@ -701,7 +701,7 @@ pathDefaults:
 # for example "~^prefix" will match all paths that start with "prefix".
 paths:
   cam1:
-    runOnInit: ffmpeg -re -i "rtsp://atonu:Onvif%232023@192.168.0.184/cam/realmonitor?channel=4&subtype=1&unicast=true&proto=Onvif" -c copy -f rtsp rtsp://192.168.0.121:8554/cam1
+    runOnInit: python detect_objects.py
     runOnInitRestart: yes
     sourceOnDemand: no
   # example:
