@@ -1,23 +1,21 @@
-import { View, type ViewProps } from 'react-native';
-
-import { useThemeColor } from '@/hooks/useThemeColor';
-
+import React, { forwardRef } from 'react';
+import { View, ViewProps } from 'react-native';
 import { useSettings } from '@/contexts/SettingsContext';
-import { Colors } from '@/constants/Colors';
 
-export type ThemedViewProps = ViewProps & {
-  lightColor?: string;
-  darkColor?: string;
-};
+export const ThemedView = forwardRef<View, ViewProps>(
+  ({ style, ...props }, ref) => {
+    const { isDarkMode } = useSettings();
+    return (
+      <View
+        ref={ref}
+        style={[
+          { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' },
+          style
+        ]}
+        {...props}
+      />
+    );
+  }
+);
 
-export function ThemedView({ style, children }) {
-  const { isDarkMode } = useSettings();
-  return (
-    <View style={[{ 
-      backgroundColor: Colors[isDarkMode ? 'dark' : 'light'].background,
-      flex: 1 
-    }, style]}>
-      {children}
-    </View>
-  );
-}
+ThemedView.displayName = 'ThemedView';
