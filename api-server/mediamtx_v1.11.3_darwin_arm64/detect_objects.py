@@ -80,12 +80,19 @@ ffmpeg_cmd = [
 
 process = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE)
 
+num = 0
+
 while True:
     ret, frame = cap.read()
     if not ret:
         continue
     
-    processed_frame, detected = detect_humans(frame)
+    # processed_frame = frame
+    if num%25 == 0: 
+        processed_frame, detected = detect_humans(frame)
+    else: 
+        processed_frame, detected = frame, False
+    num += 1
     
     # Save image if detection and cooldown passed
     current_time = time.time()
