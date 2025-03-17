@@ -8,8 +8,14 @@ import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { StatusBar } from 'expo-status-bar';
 
+// Add to existing imports
+import { useAuth } from '@/contexts/AuthContext';
+
+
 export default function SettingsScreen() {
   const router = useRouter();
+  // Inside component
+  const { logout } = useAuth();
   const { isDarkMode, toggleTheme, isMonitoringActive, toggleMonitoring } = useSettings();
 
   const styles = StyleSheet.create({
@@ -180,6 +186,18 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </ThemedView>
 
+          <TouchableOpacity 
+            style={styles.settingsButton}
+            onPress={() => {
+              logout();
+              router.replace('/login');
+            }}
+          >
+            <ThemedText style={styles.buttonText}>Logout</ThemedText>
+            <MaterialIcons name="logout" size={20} color={Colors[isDarkMode ? 'dark' : 'light'].text} />
+          </TouchableOpacity>
+
+
           {/* User Profile Section */}
           <ThemedView style={styles.section}>
             <ThemedText type="title" style={styles.sectionTitle}>
@@ -203,17 +221,21 @@ export default function SettingsScreen() {
               </ThemedText>
               <TouchableOpacity
                 onPress={toggleMonitoring}
-                style={[
-                  styles.toggleButton,
-                  { backgroundColor: isMonitoringActive ? Colors[isDarkMode ? 'dark' : 'light'].primary : '#ff4757' }
-                ]}
+          style={{
+              backgroundColor: Colors[isDarkMode ? 'dark' : 'light'].primary,
+              padding: 10,
+              borderRadius: 8,
+            }}
               >
-                <ThemedText style={styles.toggleText}>
-                  {isMonitoringActive ? 'ACTIVE' : 'INACTIVE'}
+              <ThemedText style={{ color: 'white' }}>
+                  {isMonitoringActive ? 'DEACTIVATE' : 'ACTIVATE'}
                 </ThemedText>
               </TouchableOpacity>
             </ThemedView>
           </ThemedView>
+
+
+
 
           {/* Additional Settings Section */}
           <ThemedView style={styles.section}>

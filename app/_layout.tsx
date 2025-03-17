@@ -1,39 +1,39 @@
-import { Stack } from 'expo-router';
-import { SettingsProvider } from '@/contexts/SettingsContext';
+import { Stack, useNavigation } from 'expo-router';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { ActivityIndicator, View } from 'react-native';
+import { useEffect } from 'react';
+
+function RootLayoutNav() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (!isLoading) {
+      navigation.navigate(isAuthenticated ? '(tabs)' : 'login');
+    }
+  }, [isAuthenticated, isLoading]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   return (
-    <SettingsProvider>
-      <Stack>
-        <Stack.Screen 
-          name="(tabs)" 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen 
-          name="gallery/index" 
-          options={{ 
-            title: 'Incident Gallery',
-            headerStyle: { backgroundColor: '#1a1a1a' },
-            headerTintColor: '#fff',
-          }} 
-        />
-        <Stack.Screen 
-          name="gallery/[id]" 
-          options={{ 
-            title: 'Incident Details',
-            headerStyle: { backgroundColor: '#1a1a1a' },
-            headerTintColor: '#fff',
-          }} 
-        />
-        <Stack.Screen 
-          name="notifications/index" 
-          options={{ 
-            title: 'Notification Settings',
-            headerStyle: { backgroundColor: '#1a1a1a' },
-            headerTintColor: '#fff',
-          }} 
-        />
-      </Stack>
-    </SettingsProvider>
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }

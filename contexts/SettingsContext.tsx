@@ -29,8 +29,8 @@ const SettingsContext = createContext<SettingsContextType>({
 export const useSettings = () => useContext(SettingsContext);
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isMonitoringActive, setIsMonitoringActive] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMonitoringActive, setIsMonitoringActive] = useState(false);
   const [notificationContacts, setNotificationContacts] = useState<Contact[]>([]);
 
   useEffect(() => {
